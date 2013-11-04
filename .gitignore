@@ -1,0 +1,11 @@
+target
+submission
+lib_managed
+
+.idea
+.idea_modules
+
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
