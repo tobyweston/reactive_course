@@ -17,28 +17,16 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     findMin(h) == a.min(b)
   }
 
-  property("delete min") = forAll { a: Int =>
-    val h = deleteMin(insert(a, empty))
-    isEmpty(h)
-  }
-
-  property("delete min with two") = forAll { (a: Int, b: Int) =>
+  property("delete min") = forAll { (a: Int, b: Int) =>
     val h = insert(b, insert(a, empty))
     findMin(deleteMin(h)) == a.max(b)
   }
 
-  property("ordering") = forAll { h: H =>
-    val xs = elements(h)
-    xs == xs.sorted
+  property("ordering") = forAll { (h1: H, h2: H) =>
+    (elements(h1) ++ elements(h2)).sorted == elements(meld(h1, h2))
   }
 
-  property("contents") = forAll { (a: Int, b: Int, c: Int) =>
-    val h = insert(c, insert(b, insert(a, empty)))
-    val xs = elements(h)
-    xs.contains(a) && xs.contains(b) && xs.contains(c)
-  }
-
-  property("heap meld") = forAll { (h1: H, h2: H) =>
+  property("meld") = forAll { (h1: H, h2: H) =>
     val min = findMin(meld(h1, h2))
     min == findMin(h1) || min == findMin(h2)
   }
@@ -49,7 +37,7 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
 
   lazy val genHeap: Gen[H] = for {
     a <- arbitrary[Int]
-    h <- oneOf(value(empty), genHeap)
+    h <- frequency((1, value(empty)), (5, genHeap))
   } yield insert(a, h)
 
   implicit lazy val arbHeap: Arbitrary[H] = Arbitrary(genHeap)
