@@ -76,8 +76,30 @@ abstract class CircuitSimulator extends Simulator {
     inverter(d, output)
   }
 
-  def demux(in: Wire, c: List[Wire], out: List[Wire]) {
-    ???
+  def passThrough(input: Wire, output: Wire) {
+    def passThroughAction() {
+      val inputSig = input.getSignal
+      afterDelay(0) { output.setSignal(inputSig) }
+    }
+    input addAction passThroughAction
+  }
+
+  def decoder(input: Wire, out1: Wire, out2: Wire) {
+    inverter(input, out1)
+    passThrough(input, out2)
+  }
+
+  def demuxOne(in: Wire, c: Wire, out1: Wire, out2: Wire) {
+    val a, b = new Wire
+    decoder(c, a, b)
+    andGate(in, a, out1)
+    andGate(in, b, out2)
+  }
+
+  def demux(in: Wire, c: List[Wire], out: List[Wire]) = c match {
+    case Nil => passThrough(in, out.head)
+    case x :: Nil => demuxOne(in, x, out.head, out.tail.head)
+    case x :: xs => ()
   }
 
 }
