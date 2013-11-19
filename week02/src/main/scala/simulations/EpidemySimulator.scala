@@ -75,9 +75,10 @@ class EpidemySimulator extends Simulator {
       if(!dead) {
         val possibleMoves = next.filterNot(visiblyInfectious)
         if (!possibleMoves.isEmpty) moveTo(possibleMoves(randomBelow(possibleMoves.length)))
-        if(becomesInfected) infect()
-        afterDelay(upTo(5)) { move() }
+        if (becomesInfected) infect()
       }
+
+      afterDelay(upTo(5)) { move() }
     }
 
     def becomesInfected = !infected && !immune && infectious(row, col) && random <= transRate
