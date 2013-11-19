@@ -8,10 +8,14 @@ class Wire {
 
   def getSignal: Boolean = sigVal
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
   
 >>>>>>> origin/master
+=======
+  
+>>>>>>> added week 2 files
   def setSignal(s: Boolean) {
     if (s != sigVal) {
       sigVal = s
@@ -36,10 +40,14 @@ abstract class CircuitSimulator extends Simulator {
       () => afterDelay(0) {
         println(
 <<<<<<< HEAD
+<<<<<<< HEAD
           "  " + currentTime + ": " + name + " -> " + wire.getSignal)
 =======
           "  " + currentTime + ": " + name + " -> " +  wire.getSignal)
 >>>>>>> origin/master
+=======
+          "  " + currentTime + ": " + name + " -> " +  wire.getSignal)
+>>>>>>> added week 2 files
       }
     }
   }
@@ -48,12 +56,16 @@ abstract class CircuitSimulator extends Simulator {
     def invertAction() {
       val inputSig = input.getSignal
 <<<<<<< HEAD
+<<<<<<< HEAD
       afterDelay(InverterDelay) {
         output.setSignal(!inputSig)
       }
 =======
       afterDelay(InverterDelay) { output.setSignal(!inputSig) }
 >>>>>>> origin/master
+=======
+      afterDelay(InverterDelay) { output.setSignal(!inputSig) }
+>>>>>>> added week 2 files
     }
     input addAction invertAction
   }
@@ -63,12 +75,16 @@ abstract class CircuitSimulator extends Simulator {
       val a1Sig = a1.getSignal
       val a2Sig = a2.getSignal
 <<<<<<< HEAD
+<<<<<<< HEAD
       afterDelay(AndGateDelay) {
         output.setSignal(a1Sig & a2Sig)
       }
 =======
       afterDelay(AndGateDelay) { output.setSignal(a1Sig & a2Sig) }
 >>>>>>> origin/master
+=======
+      afterDelay(AndGateDelay) { output.setSignal(a1Sig & a2Sig) }
+>>>>>>> added week 2 files
     }
     a1 addAction andAction
     a2 addAction andAction
@@ -79,6 +95,7 @@ abstract class CircuitSimulator extends Simulator {
   //
 
   def orGate(a1: Wire, a2: Wire, output: Wire) {
+<<<<<<< HEAD
 <<<<<<< HEAD
     def orAction() {
       val a1Sig = a1.getSignal
@@ -126,6 +143,8 @@ abstract class CircuitSimulator extends Simulator {
       demux(o2, xs, out.take(out.size / 2))
     }
 =======
+=======
+>>>>>>> added week 2 files
     ???
   }
   
@@ -135,7 +154,10 @@ abstract class CircuitSimulator extends Simulator {
 
   def demux(in: Wire, c: List[Wire], out: List[Wire]) {
     ???
+<<<<<<< HEAD
 >>>>>>> origin/master
+=======
+>>>>>>> added week 2 files
   }
 
 }

@@ -45,6 +45,9 @@ class EpidemySuite extends FunSuite {
 
   test("life cycle"){
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> added week 2 files
     val es = new EpidemySimulator
 
     val incubationTime = 6
@@ -83,6 +86,7 @@ class EpidemySuite extends FunSuite {
 
     assert(es.agenda.head.time == dieTime, "You should set a 'die' event (decides with a probability 25% whether the person dies) after 14 days")
     while(es.agenda.head.time == dieTime) es.next
+<<<<<<< HEAD
 =======
     var personDied = true;
     while(!personDied){
@@ -126,6 +130,8 @@ class EpidemySuite extends FunSuite {
       while(es.agenda.head.time == dieTime) es.next
     }
 >>>>>>> origin/master
+=======
+>>>>>>> added week 2 files
   }
 
 

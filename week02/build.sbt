@@ -11,6 +11,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> added week 2 files
 libraryDependencies += "com.netflix.rxjava" % "rxjava-scala" % "0.14.6"
 
 libraryDependencies += "org.json4s" % "json4s-native_2.10" % "3.2.5"
@@ -29,8 +32,11 @@ libraryDependencies += "com.squareup.retrofit" % "retrofit" % "1.0.0"
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.2"
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/master
+=======
+>>>>>>> added week 2 files
 // This setting defines the project to which a solution is submitted. When creating a
 // handout, the 'createHandout' task will make sure that its value is correct.
 submitProjectName := "simulations"
