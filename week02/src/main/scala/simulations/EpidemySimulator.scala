@@ -49,7 +49,7 @@ class EpidemySimulator extends Simulator {
   }
 
   class Person (val id: Int) {
-    var infected = id <= initialInfected
+    var infected = false
     var sick = false
     var immune = false
     var dead = false
@@ -85,11 +85,14 @@ class EpidemySimulator extends Simulator {
     def infect() = {
       infected = true
       afterDelay(incubationTime)  { sick = true }
-      afterDelay(dieTime) { if(random <= dieRate) dead = true }
+      for(delay <- dieTime until immuneTime) {
+        afterDelay(delay) { if (sick && !dead && random <= dieRate) dead = true }
+      }
       afterDelay(immuneTime) { if(!dead) { immune = true; sick = false } }
       afterDelay(healTime) { if(!dead) { infected = false; immune = false } }
     }
 
+    if(id <= initialInfected) infect()
     move()
   }
 }
