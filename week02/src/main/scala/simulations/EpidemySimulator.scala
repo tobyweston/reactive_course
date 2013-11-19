@@ -29,6 +29,25 @@ class EpidemySimulator extends Simulator {
 
   val persons: List[Person] = (for(id <- 1 to population) yield new Person(id)).toList
 
+  def moves = List((1, 0), (-1, 0), (0, 1), (0, -1))
+
+  def in(room: (Int, Int)): Person => Boolean = room match {
+    case (r, c) => { p => p.row == r && p.col == c }
+  }
+
+  def peopleIn(room: (Int, Int)) = persons match {
+    case null => Nil
+    case people => people.filter(in(room))
+  }
+
+  def visiblyInfectious(room: (Int, Int)): Boolean = {
+    peopleIn(room).count(p => p.sick || p.dead) > 0
+  }
+
+  def infectious(room: (Int, Int)): Boolean = {
+    peopleIn(room).count(p => p.infected || p.sick || p.dead) > 0
+  }
+
   class Person (val id: Int) {
     var infected = id <= initialInfected
     var sick = false
@@ -43,15 +62,32 @@ class EpidemySimulator extends Simulator {
     // to complete with simulation logic
     //
 
+    def next = moves.map { case (x, y) => (
+      ((row + x) % roomRows + roomRows) % roomRows,
+      ((col + y) % roomColumns + roomColumns) % roomColumns
+    )}
+
+    def moveTo(room: (Int, Int)) = room match {
+      case (r, c) => { row = r; col = c }
+    }
+
     def move(): Unit = {
-
-      // choose random direction
-      // apply transformation on row, col
-      // remember to wrap at 0 or 8
-
       if(!dead) {
+        val possibleMoves = next.filterNot(visiblyInfectious)
+        if (!possibleMoves.isEmpty) moveTo(possibleMoves(randomBelow(possibleMoves.length)))
+        if(becomesInfected) infect()
         afterDelay(upTo(5)) { move() }
       }
+    }
+
+    def becomesInfected = !infected && !immune && infectious(row, col) && random <= transRate
+
+    def infect() = {
+      infected = true
+      afterDelay(incubationTime)  { sick = true }
+      afterDelay(dieTime) { if(random <= dieRate) dead = true }
+      afterDelay(immuneTime) { if(!dead) { immune = true; sick = false } }
+      afterDelay(healTime) { if(!dead) { infected = false; immune = false } }
     }
 
     move()
