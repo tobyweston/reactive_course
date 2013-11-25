@@ -20,7 +20,7 @@ class NodeScalaSuite extends FunSuite {
   test("A Future should always be created") {
     val always = Future.always(517)
 
-    assert(Await.result(always, 0 nanos) == 517)
+    assert(Await.result(always, 0 nanos) === 517)
   }
 
   test("A Future should never be created") {
@@ -32,6 +32,33 @@ class NodeScalaSuite extends FunSuite {
     } catch {
       case t: TimeoutException => // ok!
     }
+  }
+
+  test("List[Future[T]] can be transformed to a Future[List[T]") {
+    val odd = Future.always(135)
+    val even = Future.always(246)
+    val all = Future.all(List(odd, even))
+
+    assert(Await.result(all, 1 second) === List(135, 246))
+  }
+
+  test("List[Future[T]] can contain a failed computation") {
+    val exception = new Throwable("Failure!")
+    val good = Future.always("Success!")
+    val bad = Future.failed(exception)
+    val all = Future.all(List(good, bad))
+
+    try {
+      Await.result(all, 1 second)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("List[Future[T]] can be transformed to a Future[T] witht he first available result") {
+    val any = Future.any(List(Future.never, Future.always(10), Future.never))
+    assert(Await.result(any, 1 second) === 10)
   }
 
   test("CancellationTokenSource should allow stopping the computation") {
