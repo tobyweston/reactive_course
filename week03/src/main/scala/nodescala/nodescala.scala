@@ -45,7 +45,6 @@ trait NodeScala {
 
 }
 
-
 object NodeScala {
 
   /** A request is a multimap of headers, where each header is a key-value pair of strings.

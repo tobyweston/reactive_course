@@ -34,7 +34,7 @@ class NodeScalaSuite extends FunSuite {
     }
   }
 
-  test("List[Future[T]] can be transformed to a Future[List[T]") {
+  test("List[Future[T]] to Future[List[T]") {
     val odd = Future.always(135)
     val even = Future.always(246)
     val all = Future.all(List(odd, even))
@@ -42,7 +42,7 @@ class NodeScalaSuite extends FunSuite {
     assert(Await.result(all, 1 second) === List(135, 246))
   }
 
-  test("List[Future[T]] can contain a failed computation") {
+  test("List[Future[T]] to future[List[T]] with failure") {
     val exception = new Throwable("Failure!")
     val good = Future.always("Success!")
     val bad = Future.failed(exception)
@@ -56,9 +56,35 @@ class NodeScalaSuite extends FunSuite {
     }
   }
 
-  test("List[Future[T]] can be transformed to a Future[T] witht he first available result") {
+  test("List[Future[T]] to first Future[T]") {
     val any = Future.any(List(Future.never, Future.always(10), Future.never))
     assert(Await.result(any, 1 second) === 10)
+  }
+
+  test("List[Future[T]] to first Future[T] with failure") {
+    val exception = new Throwable("Failure!")
+    val any = Future.any(List(Future.never, Future.failed(exception), Future.never))
+    try {
+      Await.result(any, 1 second)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("Future completes after delay") {
+    val delay = Future.delay(3 seconds)
+    assert(Await.result(delay, 4 seconds) === ())
+  }
+
+  test("Future completes after delay with failure") {
+    val delay = Future.delay(3 seconds)
+    try {
+      Await.result(delay, 1 second)
+      assert(false)
+    } catch {
+      case t: Throwable =>
+    }
   }
 
   test("CancellationTokenSource should allow stopping the computation") {

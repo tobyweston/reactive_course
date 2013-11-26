@@ -44,11 +44,21 @@ package object nodescala {
      *
      *  may return a `Future` succeeded with `1`, `2` or failed with an `Exception`.
      */
-    def any[T](fs: List[Future[T]]): Future[T] = ???
+    def any[T](fs: List[Future[T]]): Future[T] = {
+      val p = Promise[T]()
+      fs.foreach(_.onComplete(x => p.tryComplete(x)))
+      p.future
+    }
 
     /** Returns a future with a unit value that is completed after time `t`.
      */
-    def delay(t: Duration): Future[Unit] = ???
+    def delay(t: Duration): Future[Unit] = {
+      val p = Promise[Unit]()
+      future(Await.ready(Promise().future, t)) onComplete { _ =>
+        p.complete(Success())
+      }
+      p.future
+    }
 
     /** Completes this future with user input.
      */
