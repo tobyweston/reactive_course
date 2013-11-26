@@ -77,13 +77,34 @@ class NodeScalaSuite extends FunSuite {
     assert(Await.result(delay, 4 seconds) === ())
   }
 
-  test("Future completes after delay with failure") {
+  test("Future not complete before delay") {
     val delay = Future.delay(3 seconds)
     try {
       Await.result(delay, 1 second)
       assert(false)
     } catch {
       case t: Throwable =>
+    }
+  }
+
+  test("Future.now returns result if completed successfully ") {
+    assert(Future.always(3).now === 3)
+  }
+
+  test("Future.now throws exception if completed with failure") {
+    val exception = new Throwable("Failure!")
+    try {
+      Future.failed(exception).now
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("Future.now throws exception if not completed") {
+    try {
+      Future.never.now
+    } catch {
+      case t: NoSuchElementException =>
     }
   }
 
