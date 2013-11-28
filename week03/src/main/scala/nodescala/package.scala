@@ -33,7 +33,13 @@ package object nodescala {
      *  The values in the list are in the same order as corresponding futures `fs`.
      *  If any of the futures `fs` fails, the resulting future also fails.
      */
-    def all[T](fs: List[Future[T]]): Future[List[T]] = Future.sequence(fs)
+    def all[T](fs: List[Future[T]]): Future[List[T]] = {
+      val p = Promise[List[T]]()
+      p.success(Nil)
+      fs.foldRight(p.future) {
+        (f, acc) => for {x <- f; xs <- acc } yield x :: xs
+      }
+    }
 
     /** Given a list of futures `fs`, returns the future holding the value of the future from `fs` that completed first.
      *  If the first completing future in `fs` fails, then the result is failed as well.
@@ -100,7 +106,19 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = ???
+    def continueWith[S](cont: Future[T] => S): Future[S] = {
+      val promise = Promise[S]()
+
+      f.onComplete {
+        case Success(_) => Try(cont(f)) match {
+          case Success(v) => promise.success(v)
+          case Failure(t) => promise.failure(t)
+        }
+        case Failure(t) => promise.failure(t)
+      }
+
+      promise.future
+    }
 
     /** Continues the computation of this future by taking the result
      *  of the current future and mapping it into another future.
@@ -108,7 +126,19 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continue[S](cont: Try[T] => S): Future[S] = ???
+    def continue[S](cont: Try[T] => S): Future[S] = {
+      val promise = Promise[S]()
+
+      f.onComplete {
+        case s: Success[T] => Try(cont(s)) match {
+          case Success(v) => promise.success(v)
+          case Failure(t) => promise.failure(t)
+        }
+        case Failure(t) => promise.failure(t)
+      }
+
+      promise.future
+    }
 
   }
 

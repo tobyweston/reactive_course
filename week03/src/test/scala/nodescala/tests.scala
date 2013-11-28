@@ -108,6 +108,64 @@ class NodeScalaSuite extends FunSuite {
     }
   }
 
+  test("Future.continueWith returns result of function") {
+    val result = Future.always(5).continueWith(_.now + 2)
+    assert(Await.result(result, 1 seconds) === 7)
+  }
+
+  test("Future.continueWith returns failure if completed with failure") {
+    val exception = new Throwable("Failure!")
+    val result = Future.failed(exception).continueWith(_ => ())
+
+    try {
+      Await.result(result, 1 seconds)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("Future.continueWith returns failure if function throws") {
+    val exception = new Throwable("Failure!")
+    val result = Future.always(5).continueWith(_ => throw exception)
+
+    try {
+      Await.result(result, 1 seconds)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("Future.continue returns result of function") {
+    val result = Future.always(5).continue(_.get + 2)
+    assert(Await.result(result, 1 seconds) === 7)
+  }
+
+  test("Future.continue returns failure if completed with failure") {
+    val exception = new Throwable("Failure!")
+    val result = Future.failed(exception).continue(_ => ())
+
+    try {
+      Await.result(result, 1 seconds)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
+  test("Future.continue returns failure if function throws") {
+    val exception = new Throwable("Failure!")
+    val result = Future.always(5).continue(_ => throw exception)
+
+    try {
+      Await.result(result, 1 seconds)
+      assert(false)
+    } catch {
+      case t: Throwable => assert(t === exception)
+    }
+  }
+
   test("CancellationTokenSource should allow stopping the computation") {
     val cts = CancellationTokenSource()
     val ct = cts.cancellationToken
