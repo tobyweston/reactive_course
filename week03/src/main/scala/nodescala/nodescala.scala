@@ -49,8 +49,9 @@ trait NodeScala {
    */
   def start(relativePath: String)(handler: Request => Response): Subscription = {
     val listener = createListener(relativePath)
+    val sub1 = listener.start()
 
-    Future.run() { ct =>
+    val sub2 = Future.run() { ct =>
       Future {
         while(ct.nonCancelled) {
           listener.nextRequest().onSuccess {
@@ -59,8 +60,14 @@ trait NodeScala {
         }
       }
     }
-  }
 
+    val shutdown = Subscription(sub1, sub2)
+    Future.delay(5 seconds) onSuccess {
+      case _ => shutdown.unsubscribe()
+    }
+
+    shutdown
+  }
 }
 
 object NodeScala {

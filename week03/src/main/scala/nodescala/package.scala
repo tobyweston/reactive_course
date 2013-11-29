@@ -60,7 +60,7 @@ package object nodescala {
      */
     def delay(t: Duration): Future[Unit] = {
       val p = Promise[Unit]()
-      future(Await.ready(Promise().future, t)) onComplete { _ =>
+      Future(blocking{Thread.sleep(t.toMillis)}) onComplete { _ =>
         p.complete(Success())
       }
       p.future
