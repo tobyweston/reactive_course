@@ -11,6 +11,7 @@ class EpidemySimulator extends Simulator {
     val roomRows: Int = 8
     val roomColumns: Int = 8
 
+<<<<<<< HEAD
     val incubationTime: Int = 6
     val dieTime: Int = 14
     val immuneTime: Int = 16
@@ -49,6 +50,14 @@ class EpidemySimulator extends Simulator {
   def infectious(room: (Int, Int)): Boolean = {
     peopleIn(room).count(p => p.infected || p.sick || p.dead) > 0
   }
+=======
+    // to complete: additional parameters of simulation
+  }
+
+  import SimConfig._
+
+  val persons: List[Person] = List() // to complete: construct list of persons
+>>>>>>> origin/master
 
   class Person (val id: Int) {
     var infected = false
@@ -60,6 +69,7 @@ class EpidemySimulator extends Simulator {
     var row: Int = randomBelow(roomRows)
     var col: Int = randomBelow(roomColumns)
 
+<<<<<<< HEAD
 
     def next = moves.map { case (x, y) => (
       ((row + x) % roomRows + roomRows) % roomRows,
@@ -95,5 +105,10 @@ class EpidemySimulator extends Simulator {
 
     if(id <= initialInfected) infect()
     move()
+=======
+    //
+    // to complete with simulation logic
+    //
+>>>>>>> origin/master
   }
 }

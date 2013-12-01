@@ -10,34 +10,30 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
-<<<<<<< HEAD
-libraryDependencies += "com.netflix.rxjava" % "rxjava-scala" % "0.14.6"
-
-libraryDependencies += "org.json4s" % "json4s-native_2.10" % "3.2.5"
-
-libraryDependencies += "org.scala-lang" % "scala-swing" % "2.10.3"
-
-libraryDependencies += "net.databinder.dispatch" % "dispatch-core_2.10" % "0.11.0"
-
-libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.3"
-
-libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.5"
-
-libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.5"
-
-libraryDependencies += "com.squareup.retrofit" % "retrofit" % "1.0.0"
-
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.2"
 
-=======
->>>>>>> origin/master
 // This setting defines the project to which a solution is submitted. When creating a
 // handout, the 'createHandout' task will make sure that its value is correct.
-submitProjectName := "simulations"
+submitProjectName := "nodescala"
 
 libraryDependencies <++= (currentProject) { c =>
   if (c.isEmpty || c == "quickcheck") Seq(
     "org.scalacheck" %% "scalacheck" % "1.10.1"
+  )
+  else Seq.empty
+}
+
+libraryDependencies <++= (currentProject) { c =>
+  if (c.isEmpty || c == "nodescala" || c == "suggestions") Seq(
+    "com.netflix.rxjava" % "rxjava-scala" % "0.14.6",
+    "org.json4s" % "json4s-native_2.10" % "3.2.5",
+    "org.scala-lang" % "scala-swing" % "2.10.3",
+    "net.databinder.dispatch" % "dispatch-core_2.10" % "0.11.0",
+    "org.scala-lang" % "scala-reflect" % "2.10.3",
+    "org.slf4j" % "slf4j-api" % "1.7.5",
+    "org.slf4j" % "slf4j-simple" % "1.7.5",
+    "com.squareup.retrofit" % "retrofit" % "1.0.0",
+    "org.scala-lang.modules" %% "scala-async" % "0.9.0-M2"
   )
   else Seq.empty
 }
@@ -99,9 +95,14 @@ Map(
                   assignmentPartId = "pA3TAeu1",
                   maxScore = 10d,
                   styleScoreRatio = 0.0,
+                  courseId=currentCourseId),
+  "nodescala" -> ProjectDetails(
+                  packageName = "nodescala",
+                  assignmentPartId = "RvoTAbRy",
+                  maxScore = 10d,
+                  styleScoreRatio = 0.0,
                   courseId=currentCourseId)
-)
-}
+)}
 
 // Files that we hand out to the students
 handoutFiles <<= (baseDirectory, projectDetailsMap, commonSourcePackages) map { (basedir, detailsMap, commonSrcs) =>

@@ -44,6 +44,7 @@ class EpidemySuite extends FunSuite {
   }
 
   test("life cycle"){
+<<<<<<< HEAD
     val es = new EpidemySimulator
 
     val incubationTime = 6
@@ -82,6 +83,49 @@ class EpidemySuite extends FunSuite {
 
     assert(es.agenda.head.time == dieTime, "You should set a 'die' event (decides with a probability 25% whether the person dies) after 14 days")
     while(es.agenda.head.time == dieTime) es.next
+=======
+    var personDied = true;
+    while(!personDied){
+      val es = new EpidemySimulator
+
+      val incubationTime = 6
+      val dieTime = 14
+      val immuneTime = 16
+      val healTime = 18
+
+      val prevalenceRate = 0.01
+      val transRate = 0.4
+      val dieRate = 0.25
+
+      val infectedPerson = (es.persons.find{_.infected}).get
+
+      //before incubation time
+    	while(es.agenda.head.time < incubationTime){
+    		assert(infectedPerson.infected == true, "Infected person keeps infected in 6 days")
+    		assert(infectedPerson.sick == false, "Infected person does not get sick in 6 days")
+    		assert(infectedPerson.immune == false, "Infected person cannot become immune in 6 days")
+    		assert(infectedPerson.dead == false, "Infected person does not die in 6 days")
+    		es.next
+    	}
+
+      //incubation time has passed, there should be an event for getting sick
+      assert(es.agenda.head.time == incubationTime, "You should set a 'sick' event after incubation time")
+      while(es.agenda.head.time == incubationTime) es.next
+      assert(infectedPerson.sick == true, "Infected person should become sick after 6 days")
+
+      //wait for dieTime
+      while(es.agenda.head.time < dieTime){
+      	assert(infectedPerson.infected == true, "Sick person keeps infected")
+      	assert(infectedPerson.sick == true, "Sick person keeps sick before turning immune")
+      	assert(infectedPerson.immune == false, "Sick person is not immune")
+      	assert(infectedPerson.dead == false, "Sick person does not die before 14 infected days")
+      	es.next
+      }
+
+      assert(es.agenda.head.time == dieTime, "You should set a 'die' event (decides with a probability 25% whether the person dies) after 14 days")
+      while(es.agenda.head.time == dieTime) es.next
+    }
+>>>>>>> origin/master
   }
 
 

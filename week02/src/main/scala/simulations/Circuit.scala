@@ -7,7 +7,11 @@ class Wire {
   private var actions: List[Simulator#Action] = List()
 
   def getSignal: Boolean = sigVal
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> origin/master
   def setSignal(s: Boolean) {
     if (s != sigVal) {
       sigVal = s
@@ -31,7 +35,11 @@ abstract class CircuitSimulator extends Simulator {
     wire addAction {
       () => afterDelay(0) {
         println(
+<<<<<<< HEAD
           "  " + currentTime + ": " + name + " -> " + wire.getSignal)
+=======
+          "  " + currentTime + ": " + name + " -> " +  wire.getSignal)
+>>>>>>> origin/master
       }
     }
   }
@@ -39,9 +47,13 @@ abstract class CircuitSimulator extends Simulator {
   def inverter(input: Wire, output: Wire) {
     def invertAction() {
       val inputSig = input.getSignal
+<<<<<<< HEAD
       afterDelay(InverterDelay) {
         output.setSignal(!inputSig)
       }
+=======
+      afterDelay(InverterDelay) { output.setSignal(!inputSig) }
+>>>>>>> origin/master
     }
     input addAction invertAction
   }
@@ -50,9 +62,13 @@ abstract class CircuitSimulator extends Simulator {
     def andAction() {
       val a1Sig = a1.getSignal
       val a2Sig = a2.getSignal
+<<<<<<< HEAD
       afterDelay(AndGateDelay) {
         output.setSignal(a1Sig & a2Sig)
       }
+=======
+      afterDelay(AndGateDelay) { output.setSignal(a1Sig & a2Sig) }
+>>>>>>> origin/master
     }
     a1 addAction andAction
     a2 addAction andAction
@@ -63,6 +79,7 @@ abstract class CircuitSimulator extends Simulator {
   //
 
   def orGate(a1: Wire, a2: Wire, output: Wire) {
+<<<<<<< HEAD
     def orAction() {
       val a1Sig = a1.getSignal
       val a2Sig = a2.getSignal
@@ -108,6 +125,17 @@ abstract class CircuitSimulator extends Simulator {
       demux(o1, xs, out.drop(out.size / 2))
       demux(o2, xs, out.take(out.size / 2))
     }
+=======
+    ???
+  }
+  
+  def orGate2(a1: Wire, a2: Wire, output: Wire) {
+    ???
+  }
+
+  def demux(in: Wire, c: List[Wire], out: List[Wire]) {
+    ???
+>>>>>>> origin/master
   }
 
 }
