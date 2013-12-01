@@ -7,7 +7,7 @@ class Wire {
   private var actions: List[Simulator#Action] = List()
 
   def getSignal: Boolean = sigVal
-  
+
   def setSignal(s: Boolean) {
     if (s != sigVal) {
       sigVal = s
@@ -31,7 +31,7 @@ abstract class CircuitSimulator extends Simulator {
     wire addAction {
       () => afterDelay(0) {
         println(
-          "  " + currentTime + ": " + name + " -> " +  wire.getSignal)
+          "  " + currentTime + ": " + name + " -> " + wire.getSignal)
       }
     }
   }
@@ -39,7 +39,9 @@ abstract class CircuitSimulator extends Simulator {
   def inverter(input: Wire, output: Wire) {
     def invertAction() {
       val inputSig = input.getSignal
-      afterDelay(InverterDelay) { output.setSignal(!inputSig) }
+      afterDelay(InverterDelay) {
+        output.setSignal(!inputSig)
+      }
     }
     input addAction invertAction
   }
@@ -48,7 +50,9 @@ abstract class CircuitSimulator extends Simulator {
     def andAction() {
       val a1Sig = a1.getSignal
       val a2Sig = a2.getSignal
-      afterDelay(AndGateDelay) { output.setSignal(a1Sig & a2Sig) }
+      afterDelay(AndGateDelay) {
+        output.setSignal(a1Sig & a2Sig)
+      }
     }
     a1 addAction andAction
     a2 addAction andAction
@@ -59,15 +63,51 @@ abstract class CircuitSimulator extends Simulator {
   //
 
   def orGate(a1: Wire, a2: Wire, output: Wire) {
-    ???
-  }
-  
-  def orGate2(a1: Wire, a2: Wire, output: Wire) {
-    ???
+    def orAction() {
+      val a1Sig = a1.getSignal
+      val a2Sig = a2.getSignal
+      afterDelay(OrGateDelay) {
+        output.setSignal(a1Sig || a2Sig)
+      }
+    }
+    a1 addAction orAction
+    a2 addAction orAction
   }
 
-  def demux(in: Wire, c: List[Wire], out: List[Wire]) {
-    ???
+  def orGate2(a1: Wire, a2: Wire, output: Wire) {
+    val b, c, d = new Wire
+    inverter(a1, b)
+    inverter(a2, c)
+    andGate(b, c, d)
+    inverter(d, output)
+  }
+
+  def passThrough(input: Wire, output: Wire) {
+    def passThroughAction() {
+      val inputSig = input.getSignal
+      afterDelay(0) {
+        output.setSignal(inputSig)
+      }
+    }
+    input addAction passThroughAction
+  }
+
+  def demuxSingleWire(in: Wire, c: Wire, out0: Wire, out1: Wire) {
+    val inv = new Wire
+    inverter(c, inv)
+    andGate(in, inv, out0)
+    andGate(in, c, out1)
+  }
+
+  def demux(in: Wire, c: List[Wire], out: List[Wire]): Unit = c match {
+    case Nil => passThrough(in, out.head)
+    case x :: Nil => demuxSingleWire(in, x, out.tail.head, out.head)
+    case x :: xs => {
+      val o1, o2 = new Wire
+      demuxSingleWire(in, x, o1, o2)
+      demux(o1, xs, out.drop(out.size / 2))
+      demux(o2, xs, out.take(out.size / 2))
+    }
   }
 
 }
