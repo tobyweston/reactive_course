@@ -22,19 +22,12 @@ object ObservableEx {
     val subject = ReplaySubject[T]()
 
     f.onComplete {
-      case Success(s) => {
-        subject.onNext(s)
-        subject.onCompleted()
-      }
-      case Failure(t) => {
-        subject.onError(t)
-      }
+      case Success(value) => subject.onNext(value); subject.onCompleted()
+      case Failure(throwable) => subject.onError(throwable)
     }
 
     f.onFailure {
-      case t => {
-        subject.onError(t)
-      }
+      case throwable => subject.onError(throwable)
     }
 
     subject
