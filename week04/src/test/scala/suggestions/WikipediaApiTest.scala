@@ -13,6 +13,7 @@ import gui._
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import rx.lang.scala.subscriptions.Subscription
 
 
 @RunWith(classOf[JUnitRunner])
@@ -49,6 +50,37 @@ class WikipediaApiTest extends FunSuite {
       () => completed = true
     )
     assert(completed && count == 3, "completed: " + completed + ", event count: " + count)
+  }
+
+  test("WikipediaApi should correctly recover using recovered") {
+    val exception = new Throwable
+    val requests: Observable[Int] = Observable {
+      observer => {
+        observer.onNext(1)
+        observer.onNext(2)
+        observer.onError(exception)
+        Subscription()
+      }
+    }
+    val responses = requests.recovered
+    assert(responses.toBlockingObservable.toList === List(Success(1), Success(2), Failure(exception)))
+  }
+
+  test("WikipediaApi should correctly apply function using concatRecovered") {
+    val requests = Observable(1, 2, 3)
+    val remoteComputation = (n: Int) => Observable(n, n, n)
+    val responses = requests concatRecovered remoteComputation
+
+    assert(responses.toBlockingObservable.toList === List(Success(1), Success(1), Success(1), Success(2), Success(2), Success(2), Success(3), Success(3), Success(3)))
+  }
+
+  test("WikipediaApi should correctly handle errors using concatRecovered") {
+    val exception = new Throwable
+    val requests = Observable(1, 2, 3, 4, 5)
+    val remoteComputation = { num:Int => if (num != 4) Observable(num) else Observable(exception) }
+    val responses = requests concatRecovered remoteComputation
+
+    assert(responses.toBlockingObservable.toList === List(Success(1), Success(2), Success(3), Failure(exception), Success(5)))
   }
 
   test("WikipediaApi should correctly use concatRecovered") {
