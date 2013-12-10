@@ -2,23 +2,12 @@ package suggestions
 package gui
 
 import scala.language.postfixOps
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConverters._
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Try, Success, Failure }
-import rx.subscriptions.CompositeSubscription
+import scala.util.{ Try, Failure }
 import rx.lang.scala.Observable
 import observablex._
-import search._
-<<<<<<< HEAD
-<<<<<<< HEAD
-import rx.lang.scala.Notification.{OnCompleted, OnError, OnNext}
-=======
->>>>>>> master
-=======
->>>>>>> master
 
 trait WikipediaApi {
 
@@ -44,17 +33,7 @@ trait WikipediaApi {
      *
      * E.g. `"erik", "erik meijer", "martin` should become `"erik", "erik_meijer", "martin"`
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def sanitized: Observable[String] = obs.map(_.replace(' ', '_'))
-=======
-    def sanitized: Observable[String] = ???
-
->>>>>>> master
-=======
-    def sanitized: Observable[String] = ???
-
->>>>>>> master
   }
 
   implicit class ObservableOps[T](obs: Observable[T]) {
@@ -64,15 +43,8 @@ trait WikipediaApi {
      *
      * E.g. `1, 2, 3, !Exception!` should become `Success(1), Success(2), Success(3), Failure(Exception), !TerminateStream!`
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def recovered: Observable[Try[T]] = obs.map(Try(_)).onErrorResumeNext(t => Observable(Failure(t)))
-=======
-    def recovered: Observable[Try[T]] = ???
->>>>>>> master
-=======
-    def recovered: Observable[Try[T]] = ???
->>>>>>> master
+
 
     /** Emits the events from the `obs` observable, until `totalSec` seconds have elapsed.
      *
@@ -80,17 +52,7 @@ trait WikipediaApi {
      *
      * Note: uses the existing combinators on observables.
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def timedOut(totalSec: Long): Observable[T] = obs.takeUntil(Observable.interval(totalSec seconds))
-=======
-    def timedOut(totalSec: Long): Observable[T] = ???
-
->>>>>>> master
-=======
-    def timedOut(totalSec: Long): Observable[T] = ???
-
->>>>>>> master
 
     /** Given a stream of events `obs` and a method `requestMethod` to map a request `T` into
      * a stream of responses `S`, returns a stream of all the responses wrapped into a `Try`.
@@ -117,15 +79,7 @@ trait WikipediaApi {
      *
      * Observable(Success(1), Succeess(1), Succeess(1), Succeess(2), Succeess(2), Succeess(2), Succeess(3), Succeess(3), Succeess(3))
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def concatRecovered[S](requestMethod: T => Observable[S]): Observable[Try[S]] = obs.map(requestMethod).map(_.recovered).concat
-=======
-    def concatRecovered[S](requestMethod: T => Observable[S]): Observable[Try[S]] = ???
->>>>>>> master
-=======
-    def concatRecovered[S](requestMethod: T => Observable[S]): Observable[Try[S]] = ???
->>>>>>> master
 
   }
 

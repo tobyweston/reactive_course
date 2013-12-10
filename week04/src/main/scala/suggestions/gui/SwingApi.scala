@@ -2,21 +2,10 @@ package suggestions
 package gui
 
 import scala.language.reflectiveCalls
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConverters._
-import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Try, Success, Failure }
 import scala.swing.Reactions.Reaction
 import scala.swing.event.Event
 import rx.lang.scala.Observable
-<<<<<<< HEAD
-<<<<<<< HEAD
 import rx.lang.scala.subscriptions.Subscription
-=======
->>>>>>> master
-=======
->>>>>>> master
 
 /** Basic facilities for dealing with Swing-like components.
 *
@@ -58,8 +47,6 @@ trait SwingApi {
       * @param field the text field
       * @return an observable with a stream of text field updates
       */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def textValues: Observable[String] = Observable {
       observer => {
 
@@ -75,13 +62,6 @@ trait SwingApi {
         }
       }
     }
-=======
-    def textValues: Observable[String] = ???
->>>>>>> master
-=======
-    def textValues: Observable[String] = ???
->>>>>>> master
-
   }
 
   implicit class ButtonOps(button: Button) {
@@ -91,8 +71,6 @@ trait SwingApi {
      * @param field the button
      * @return an observable with a stream of buttons that have been clicked
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
     def clicks: Observable[Button] = Observable {
       observer => {
 
@@ -108,13 +86,6 @@ trait SwingApi {
         }
       }
     }
-=======
-    def clicks: Observable[Button] = ???
->>>>>>> master
-=======
-    def clicks: Observable[Button] = ???
->>>>>>> master
-
   }
 
 }
