@@ -46,17 +46,41 @@ class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSui
     receiveN(probe, ops, expected)
   }
 
+  test("add elements to node and check") {
+    val node = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+
+    node ! Contains(testActor, id = 1, 1)
+    expectMsg(ContainsResult(1, result = false))
+    node ! Contains(testActor, id = 2, 5)
+    expectMsg(ContainsResult(2, result = false))
+
+    node ! Insert(testActor, id = 3, 2)
+    expectMsg(OperationFinished(3))
+    node ! Insert(testActor, id = 4, 4)
+    expectMsg(OperationFinished(4))
+
+    node ! Insert(testActor, id = 5, 1)
+    expectMsg(OperationFinished(5))
+    node ! Contains(testActor, id = 6, 1)
+    expectMsg(ContainsResult(6, result = true))
+
+    node ! Insert(testActor, id = 7, 5)
+    expectMsg(OperationFinished(7))
+    node ! Contains(testActor, id = 8, 5)
+    expectMsg(ContainsResult(8, result = true))
+  }
+
   test("proper inserts and lookups") {
     val topNode = system.actorOf(Props[BinaryTreeSet])
 
     topNode ! Contains(testActor, id = 1, 1)
-    expectMsg(ContainsResult(1, false))
+    expectMsg(ContainsResult(1, result = false))
 
     topNode ! Insert(testActor, id = 2, 1)
     topNode ! Contains(testActor, id = 3, 1)
 
     expectMsg(OperationFinished(2))
-    expectMsg(ContainsResult(3, true))
+    expectMsg(ContainsResult(3, result = true))
   }
 
   test("instruction example") {

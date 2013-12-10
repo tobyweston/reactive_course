@@ -99,9 +99,34 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
   // optional
   def receive = normal
 
+  def insert(position: Position)(requester: ActorRef, id: Int, value: Int) = {
+    if(subtrees.contains(position)) subtrees(position) ! Insert(requester, id, value)
+    else {
+      subtrees = subtrees.updated(position, context.actorOf(BinaryTreeNode.props(value, initiallyRemoved = false)))
+      requester ! OperationFinished(id)
+    }
+  }
+
+  def contains(position: Position)(requester: ActorRef, id: Int, value: Int) = {
+    if(subtrees.contains(position)) subtrees(position) ! Contains(requester, id, value)
+    else requester ! ContainsResult(id, result = false)
+  }
+
   // optional
   /** Handles `Operation` messages and `CopyTo` requests. */
-  val normal: Receive = { case _ => ??? }
+  val normal: Receive = {
+    case Insert(requester, id, value) => {
+      if(value < elem) insert(Left)(requester, id, value)
+      else if(value > elem) insert(Right)(requester, id, value)
+      else requester ! OperationFinished(id)
+    }
+    case Contains(requester, id, value) => {
+      if(value < elem) contains(Left)(requester, id, value)
+      else if(value > elem) contains(Right)(requester, id, value)
+      else requester ! ContainsResult(id, elem == value)
+    }
+    case _ => ???
+  }
 
   // optional
   /** `expected` is the set of ActorRefs whose replies we are waiting for,
