@@ -107,6 +107,11 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
     }
   }
 
+  def remove(position: Position)(requester: ActorRef, id: Int, value: Int) = {
+    if(subtrees.contains(position)) subtrees(position) ! Remove(requester, id, value)
+    else requester ! OperationFinished(id)
+  }
+
   def contains(position: Position)(requester: ActorRef, id: Int, value: Int) = {
     if(subtrees.contains(position)) subtrees(position) ! Contains(requester, id, value)
     else requester ! ContainsResult(id, result = false)
@@ -120,10 +125,18 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
       else if(value > elem) insert(Right)(requester, id, value)
       else requester ! OperationFinished(id)
     }
+    case Remove(requester, id, value) => {
+      if(value < elem) remove(Left)(requester, id, value)
+      else if(value > elem) remove(Right)(requester, id, value)
+      else {
+        removed = true
+        requester ! OperationFinished(id)
+      }
+    }
     case Contains(requester, id, value) => {
       if(value < elem) contains(Left)(requester, id, value)
       else if(value > elem) contains(Right)(requester, id, value)
-      else requester ! ContainsResult(id, elem == value)
+      else requester ! ContainsResult(id, !removed)
     }
     case _ => ???
   }

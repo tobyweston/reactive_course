@@ -46,28 +46,56 @@ class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSui
     receiveN(probe, ops, expected)
   }
 
-  test("add elements to node and check") {
+  var msgId = 0
+
+  def insert(actor: ActorRef)(value: Int) = {
+    actor ! Insert(testActor, msgId, value)
+    expectMsg(OperationFinished(msgId))
+    msgId += 1
+  }
+
+  def remove(actor: ActorRef)(value: Int) = {
+    actor ! Remove(testActor, msgId, value)
+    expectMsg(OperationFinished(msgId))
+    msgId += 1
+  }
+
+  def contains(actor: ActorRef)(value: Int, expected: Boolean) = {
+    actor ! Contains(testActor, msgId, value)
+    expectMsg(ContainsResult(msgId, expected))
+    msgId += 1
+  }
+
+  test("contains only root") {
+    val root = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+    contains(root)(3, true)
+  }
+
+  test("insert smaller elements and check") {
     val node = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+    contains(node)(1, false)
+    insert(node)(2)
+    insert(node)(1)
+    contains(node)(2, true)
+    contains(node)(1, true)
+  }
 
-    node ! Contains(testActor, id = 1, 1)
-    expectMsg(ContainsResult(1, result = false))
-    node ! Contains(testActor, id = 2, 5)
-    expectMsg(ContainsResult(2, result = false))
+  test("insert larger elements and check") {
+    val node = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+    contains(node)(5, false)
+    insert(node)(4)
+    insert(node)(5)
+    contains(node)(4, true)
+    contains(node)(5, true)
+  }
 
-    node ! Insert(testActor, id = 3, 2)
-    expectMsg(OperationFinished(3))
-    node ! Insert(testActor, id = 4, 4)
-    expectMsg(OperationFinished(4))
-
-    node ! Insert(testActor, id = 5, 1)
-    expectMsg(OperationFinished(5))
-    node ! Contains(testActor, id = 6, 1)
-    expectMsg(ContainsResult(6, result = true))
-
-    node ! Insert(testActor, id = 7, 5)
-    expectMsg(OperationFinished(7))
-    node ! Contains(testActor, id = 8, 5)
-    expectMsg(ContainsResult(8, result = true))
+  test("insert elements then remove one") {
+    val node = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+    insert(node)(2)
+    insert(node)(1)
+    remove(node)(2)
+    contains(node)(1, true)
+    contains(node)(2, false)
   }
 
   test("proper inserts and lookups") {
