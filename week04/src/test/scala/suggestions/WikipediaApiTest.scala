@@ -13,7 +13,10 @@ import gui._
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+<<<<<<< HEAD
 import rx.lang.scala.subscriptions.Subscription
+=======
+>>>>>>> master
 
 
 @RunWith(classOf[JUnitRunner])
@@ -52,6 +55,7 @@ class WikipediaApiTest extends FunSuite {
     assert(completed && count == 3, "completed: " + completed + ", event count: " + count)
   }
 
+<<<<<<< HEAD
   test("WikipediaApi should correctly recover using recovered") {
     val exception = new Throwable
     val requests: Observable[Int] = Observable {
@@ -83,6 +87,8 @@ class WikipediaApiTest extends FunSuite {
     assert(responses.toBlockingObservable.toList === List(Success(1), Success(2), Success(3), Failure(exception), Success(5)))
   }
 
+=======
+>>>>>>> master
   test("WikipediaApi should correctly use concatRecovered") {
     val requests = Observable(1, 2, 3)
     val remoteComputation = (n: Int) => Observable(0 to n)
