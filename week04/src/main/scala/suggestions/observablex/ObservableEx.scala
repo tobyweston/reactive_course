@@ -9,7 +9,10 @@ import java.lang.Throwable
 import rx.lang.scala.Observable
 import rx.lang.scala.Scheduler
 <<<<<<< HEAD
+<<<<<<< HEAD
 import rx.lang.scala.subjects.ReplaySubject
+=======
+>>>>>>> master
 =======
 >>>>>>> master
 
@@ -21,6 +24,7 @@ object ObservableEx {
    * @param f future whose values end up in the resulting observable
    * @return an observable completed after producing the value of the future, or with an exception
    */
+<<<<<<< HEAD
 <<<<<<< HEAD
   def apply[T](f: Future[T])(implicit execContext: ExecutionContext): Observable[T] = {
     val subject = ReplaySubject[T]()
@@ -36,6 +40,9 @@ object ObservableEx {
 
     subject
   }
+=======
+  def apply[T](f: Future[T])(implicit execContext: ExecutionContext): Observable[T] = ???
+>>>>>>> master
 =======
   def apply[T](f: Future[T])(implicit execContext: ExecutionContext): Observable[T] = ???
 >>>>>>> master

@@ -11,7 +11,10 @@ import scala.swing.Reactions.Reaction
 import scala.swing.event.Event
 import rx.lang.scala.Observable
 <<<<<<< HEAD
+<<<<<<< HEAD
 import rx.lang.scala.subscriptions.Subscription
+=======
+>>>>>>> master
 =======
 >>>>>>> master
 
@@ -56,6 +59,7 @@ trait SwingApi {
       * @return an observable with a stream of text field updates
       */
 <<<<<<< HEAD
+<<<<<<< HEAD
     def textValues: Observable[String] = Observable {
       observer => {
 
@@ -74,6 +78,9 @@ trait SwingApi {
 =======
     def textValues: Observable[String] = ???
 >>>>>>> master
+=======
+    def textValues: Observable[String] = ???
+>>>>>>> master
 
   }
 
@@ -84,6 +91,7 @@ trait SwingApi {
      * @param field the button
      * @return an observable with a stream of buttons that have been clicked
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     def clicks: Observable[Button] = Observable {
       observer => {
@@ -100,6 +108,9 @@ trait SwingApi {
         }
       }
     }
+=======
+    def clicks: Observable[Button] = ???
+>>>>>>> master
 =======
     def clicks: Observable[Button] = ???
 >>>>>>> master
