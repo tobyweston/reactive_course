@@ -66,7 +66,9 @@ class BinaryTreeSet extends Actor {
 
   // optional
   /** Accepts `Operation` and `GC` messages. */
-  val normal: Receive = { case _ => ??? }
+  val normal: Receive = {
+    case op: Operation => root ! op
+  }
 
   // optional
   /** Handles messages while garbage collection is performed.
@@ -123,7 +125,10 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
     case Insert(requester, id, value) => {
       if(value < elem) insert(Left)(requester, id, value)
       else if(value > elem) insert(Right)(requester, id, value)
-      else requester ! OperationFinished(id)
+      else {
+        removed = false
+        requester ! OperationFinished(id)
+      }
     }
     case Remove(requester, id, value) => {
       if(value < elem) remove(Left)(requester, id, value)

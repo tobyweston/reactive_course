@@ -98,6 +98,15 @@ class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSui
     contains(node)(2, false)
   }
 
+  test("insert elements then remove and reinsert") {
+    val node = system.actorOf(Props(classOf[BinaryTreeNode], 3, false))
+    insert(node)(2)
+    remove(node)(2)
+    contains(node)(2, false)
+    insert(node)(2)
+    contains(node)(2, true)
+  }
+
   test("proper inserts and lookups") {
     val topNode = system.actorOf(Props[BinaryTreeSet])
 
