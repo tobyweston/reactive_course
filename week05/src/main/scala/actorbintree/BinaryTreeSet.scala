@@ -50,7 +50,7 @@ object BinaryTreeSet {
 }
 
 
-class BinaryTreeSet extends Actor {
+class BinaryTreeSet extends Actor with ActorLogging {
   import BinaryTreeSet._
   import BinaryTreeNode._
 
@@ -68,6 +68,11 @@ class BinaryTreeSet extends Actor {
   /** Accepts `Operation` and `GC` messages. */
   val normal: Receive = {
     case op: Operation => root ! op
+    case GC => {
+      val newRoot = createRoot
+      root ! CopyTo(newRoot)
+      context.become(garbageCollecting(newRoot))
+    }
   }
 
   // optional
@@ -75,8 +80,22 @@ class BinaryTreeSet extends Actor {
     * `newRoot` is the root of the new binary tree where we want to copy
     * all non-removed elements into.
     */
-  def garbageCollecting(newRoot: ActorRef): Receive = ???
+  def garbageCollecting(newRoot: ActorRef): Receive = {
+    case op: Operation => pendingQueue = pendingQueue.enqueue(op)
+    case GC => //ignore
+    case CopyFinished =>
+      pendingQueue = drain(pendingQueue) { newRoot ! _ }
+      context.stop(root)
+      root = newRoot
+  }
 
+  def drain[T](queue: Queue[T])(f: T => Unit): Queue[T] = queue match {
+    case q if q.isEmpty => q
+    case q =>
+      val (item, rest) = q.dequeue
+      f(item)
+      drain(rest)(f)
+  }
 }
 
 object BinaryTreeNode {
@@ -91,7 +110,7 @@ object BinaryTreeNode {
   def props(elem: Int, initiallyRemoved: Boolean) = Props(classOf[BinaryTreeNode],  elem, initiallyRemoved)
 }
 
-class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
+class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor with ActorLogging {
   import BinaryTreeNode._
   import BinaryTreeSet._
 
@@ -119,6 +138,15 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
     else requester ! ContainsResult(id, result = false)
   }
 
+  def copy(position: Position)(node: ActorRef): Option[ActorRef] = {
+    if(subtrees.contains(position)) {
+      subtrees(position) ! CopyTo(node)
+      Some(subtrees(position))
+    } else {
+      None
+    }
+  }
+
   // optional
   /** Handles `Operation` messages and `CopyTo` requests. */
   val normal: Receive = {
@@ -143,13 +171,23 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
       else if(value > elem) contains(Right)(requester, id, value)
       else requester ! ContainsResult(id, !removed)
     }
-    case _ => ???
+    case CopyTo(node) => {
+      if(!removed) node ! Insert(context.self, elem, elem)
+      context.become(copying((Set() + copy(Left)(node) + copy(Right)(node)).flatten, removed))
+    }
   }
 
   // optional
   /** `expected` is the set of ActorRefs whose replies we are waiting for,
     * `insertConfirmed` tracks whether the copy of this node to the new tree has been confirmed.
     */
-  def copying(expected: Set[ActorRef], insertConfirmed: Boolean): Receive = ???
-
+  def copying(expected: Set[ActorRef], insertConfirmed: Boolean): Receive = {
+    if(expected.isEmpty && insertConfirmed) {
+      context.parent ! CopyFinished
+      normal
+    } else {
+      case OperationFinished => context.become(copying(expected, true))
+      case CopyFinished => context.become(copying(expected - sender, insertConfirmed))
+    }
+  }
 }

@@ -10,6 +10,7 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.util.Random
 import scala.concurrent.duration._
 import org.scalatest.FunSuite
+import actorbintree.BinaryTreeNode.{CopyFinished, CopyTo}
 
 
 class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSuite with ShouldMatchers with BeforeAndAfterAll with ImplicitSender 
