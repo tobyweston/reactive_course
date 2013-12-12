@@ -4,16 +4,14 @@
 package actorbintree
 
 import akka.actor.{ Props, ActorRef, ActorSystem }
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec }
+import org.scalatest.BeforeAndAfterAll
 import akka.testkit.{ TestProbe, ImplicitSender, TestKit }
 import org.scalatest.matchers.ShouldMatchers
 import scala.util.Random
 import scala.concurrent.duration._
 import org.scalatest.FunSuite
-import actorbintree.BinaryTreeNode.{CopyFinished, CopyTo}
 
-
-class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSuite with ShouldMatchers with BeforeAndAfterAll with ImplicitSender 
+class BinaryTreeSuite(_system: ActorSystem) extends TestKit(_system) with FunSuite with ShouldMatchers with BeforeAndAfterAll with ImplicitSender
 {
 
   def this() = this(ActorSystem("PostponeSpec"))

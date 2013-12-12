@@ -5,6 +5,7 @@ package actorbintree
 
 import akka.actor._
 import scala.collection.immutable.Queue
+import akka.event.LoggingReceive
 
 object BinaryTreeSet {
 
@@ -50,7 +51,7 @@ object BinaryTreeSet {
 }
 
 
-class BinaryTreeSet extends Actor with ActorLogging {
+class BinaryTreeSet extends Actor {
   import BinaryTreeSet._
   import BinaryTreeNode._
 
@@ -58,8 +59,10 @@ class BinaryTreeSet extends Actor with ActorLogging {
 
   var root = createRoot
 
+  def emptyQueue = Queue.empty[Operation]
+
   // optional
-  var pendingQueue = Queue.empty[Operation]
+  var pendingQueue = emptyQueue
 
   // optional
   def receive = normal
@@ -68,11 +71,10 @@ class BinaryTreeSet extends Actor with ActorLogging {
   /** Accepts `Operation` and `GC` messages. */
   val normal: Receive = {
     case op: Operation => root ! op
-    case GC => {
+    case GC =>
       val newRoot = createRoot
       root ! CopyTo(newRoot)
       context.become(garbageCollecting(newRoot))
-    }
   }
 
   // optional
@@ -81,20 +83,13 @@ class BinaryTreeSet extends Actor with ActorLogging {
     * all non-removed elements into.
     */
   def garbageCollecting(newRoot: ActorRef): Receive = {
-    case op: Operation => pendingQueue = pendingQueue.enqueue(op)
     case GC => //ignore
+    case op: Operation => pendingQueue = pendingQueue.enqueue(op)
     case CopyFinished =>
-      pendingQueue = drain(pendingQueue) { newRoot ! _ }
+      pendingQueue = pendingQueue.foldLeft(emptyQueue) { (empty, op) => newRoot ! op; empty }
       context.stop(root)
       root = newRoot
-  }
-
-  def drain[T](queue: Queue[T])(f: T => Unit): Queue[T] = queue match {
-    case q if q.isEmpty => q
-    case q =>
-      val (item, rest) = q.dequeue
-      f(item)
-      drain(rest)(f)
+      context.become(normal)
   }
 }
 
@@ -110,7 +105,7 @@ object BinaryTreeNode {
   def props(elem: Int, initiallyRemoved: Boolean) = Props(classOf[BinaryTreeNode],  elem, initiallyRemoved)
 }
 
-class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor with ActorLogging {
+class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
   import BinaryTreeNode._
   import BinaryTreeSet._
 
@@ -186,7 +181,7 @@ class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor wit
       context.parent ! CopyFinished
       normal
     } else {
-      case OperationFinished => context.become(copying(expected, true))
+      case OperationFinished(n) => context.become(copying(expected, true))
       case CopyFinished => context.become(copying(expected - sender, insertConfirmed))
     }
   }
