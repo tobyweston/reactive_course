@@ -1,6 +1,6 @@
 package kvstore
 
-import akka.actor.{Cancellable, Props, Actor, ActorRef}
+import akka.actor._
 import scala.concurrent.duration._
 
 object Replicator {
@@ -15,7 +15,6 @@ object Replicator {
 
 class Replicator(val replica: ActorRef) extends Actor {
   import Replicator._
-  import Replica._
   import context.dispatcher
   
   /*
@@ -34,24 +33,25 @@ class Replicator(val replica: ActorRef) extends Actor {
     ret
   }
 
-  def acknowledgeReplication(tuple: (ActorRef, Replicate, Cancellable)) = tuple match {
-    case (actor, msg, cancellable) => {
-      cancellable.cancel()
-      actor ! Replicated(msg.key, msg.id)
-    }
-  }
-
   /* TODO Behavior for the Replicator. */
   def receive: Receive = {
     case msg: Replicate => {
       val seq = nextSeq
       val snapshot = Snapshot(msg.key, msg.valueOption, seq)
-      val cancellable = context.system.scheduler.schedule(0 millis, 100 millis, replica, snapshot)
-      acks = acks.updated(seq, (sender, msg, cancellable))
+      val retry = context.system.scheduler.schedule(0 millis, 100 millis, replica, snapshot)
+      acks = acks.updated(seq, (sender, msg, retry))
     }
     case SnapshotAck(key, seq) => {
-      acks.get(seq).foreach(acknowledgeReplication)
+      acks.get(seq).foreach {
+        case (actor, msg, retry) => {
+          retry.cancel()
+          actor ! Replicated(msg.key, msg.id)
+        }
+      }
       acks = acks - seq
+    }
+    case Terminated => {
+      System.out.println("Sorry Dave...")
     }
     case _ =>
   }
